@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QVBoxLayout, QHBoxLayout
 from PyQt5.QtCore import Qt, QTimer, QTime, QDate, QSize, pyqtSignal
+import db
 
 # The view for the actual timer and its functionalities
 
@@ -8,23 +9,45 @@ class WorkTimerWindow(QWidget):
 
     def __init__(self):
         super().__init__()
+
+        self.data = db.get_all_data()
         
-        self.time_label = QLabel("00:00:00.00", self)
+        starting_time = "00:00:00.00"
+        previous_data_found = False
+
+        for i in self.data:
+            if i[0] == QDate.currentDate().toString("d.M.yyyy"):
+                starting_time = i[1]
+                previous_data_found = True
+
+        
+        
+        self.time_label = QLabel(starting_time, self)
         self.date_label = QLabel(self)
         self.start_button = QPushButton("Start", self)
         self.stop_button = QPushButton("Stop", self)
         self.reset_button = QPushButton("Reset", self)
         self.stats_button = QPushButton("Stats", self)
 
+        self.initUI()
+
         self.timer = QTimer(self)
-        self.elapsed_time = QTime(0, 0, 0, 0)
+        
+        if not previous_data_found:
+            self.elapsed_time = QTime(0, 0, 0, 0)
+        else:
+            hours_str, minutes_str, sec_msec_str = starting_time.split(':')
+            seconds_str, milliseconds_str = sec_msec_str.split('.')
+            self.elapsed_time = QTime(int(hours_str), int(minutes_str), int(seconds_str), int(milliseconds_str))
+            
+        self.timer.timeout.connect(self.update_display)
 
         self.date_timer = QTimer(self)
-        self.date_timer.timeout.connect(self.update_date)
+        self.date_timer.timeout.connect(self.update_date_and_db)
         self.date_timer.start(1000)
-        self.update_date()
+        self.update_date_and_db()
 
-        self.initUI()
+        
 
 
     def initUI(self):
@@ -43,8 +66,7 @@ class WorkTimerWindow(QWidget):
                 padding: 10px;
                 font-size: 18px;
             }
-            
-            """)
+        """)
 
         hbox = QHBoxLayout()
         hbox.addWidget(self.start_button)
@@ -65,7 +87,7 @@ class WorkTimerWindow(QWidget):
         self.start_button.clicked.connect(self.start)
         self.stop_button.clicked.connect(self.stop)
         self.reset_button.clicked.connect(self.reset)
-        self.timer.timeout.connect(self.update_display)
+        
          
         self.setLayout(vbox)
 
@@ -81,6 +103,7 @@ class WorkTimerWindow(QWidget):
         self.timer.stop()
         self.start_button.setEnabled(True)
         self.stop_button.setEnabled(False)
+        db.log_time(self.date_label.text(), self.time_label.text())
 
     def reset(self):
         self.timer.stop()
@@ -88,6 +111,7 @@ class WorkTimerWindow(QWidget):
         self.time_label.setText(self.format_time(self.elapsed_time))
         self.start_button.setEnabled(True)
         self.stop_button.setEnabled(False)
+        db.log_time(self.date_label.text(), self.time_label.text())
 
     def format_time(self, time):
         hours = time.hour()
@@ -100,19 +124,19 @@ class WorkTimerWindow(QWidget):
         self.elapsed_time = self.elapsed_time.addMSecs(10)
         self.time_label.setText(self.format_time(self.elapsed_time))
         
-    def update_date(self):
+    def update_date_and_db(self):
+        db.log_time(self.date_label.text(), self.time_label.text())
         old_date = self.date_label.text()
         if old_date != QDate.currentDate().toString("d.M.yyyy"):
             started = self.timer.isActive()
+            self.reset()
             if started:
-                # Update database here later
-                self.reset()
                 self.start()
-            else:
-                # Update database here later
-                self.reset()
+        
 
         self.date_label.setText(QDate.currentDate().toString("d.M.yyyy"))
+
+
 
 
 
