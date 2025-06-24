@@ -1,5 +1,7 @@
 .venv/
 
+work_timer.db
+
 # Ignore Python bytecode cache files
 __pycache__/
 *.py[cod]
