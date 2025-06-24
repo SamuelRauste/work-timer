@@ -1,8 +1,11 @@
 from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QVBoxLayout, QHBoxLayout
-from PyQt5.QtCore import Qt, QTimer, QTime, QDate
+from PyQt5.QtCore import Qt, QTimer, QTime, QDate, QSize, pyqtSignal
 
+# The view for the actual timer and its functionalities
 
 class WorkTimerWindow(QWidget):
+    switch_to_stats = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         
@@ -11,6 +14,7 @@ class WorkTimerWindow(QWidget):
         self.start_button = QPushButton("Start", self)
         self.stop_button = QPushButton("Stop", self)
         self.reset_button = QPushButton("Reset", self)
+        self.stats_button = QPushButton("Stats", self)
 
         self.timer = QTimer(self)
         self.elapsed_time = QTime(0, 0, 0, 0)
@@ -31,10 +35,7 @@ class WorkTimerWindow(QWidget):
         
         vbox = QVBoxLayout()
         vbox.addWidget(self.time_label)
-
-        
         vbox.addWidget(self.date_label)
-
         vbox.addSpacing(40)
 
         self.setStyleSheet("""
@@ -45,20 +46,18 @@ class WorkTimerWindow(QWidget):
             
             """)
 
-
         hbox = QHBoxLayout()
         hbox.addWidget(self.start_button)
         hbox.addWidget(self.stop_button)
         hbox.addWidget(self.reset_button)
 
         vbox.addLayout(hbox)
-
+        vbox.addWidget(self.stats_button)
         vbox.setSpacing(2)
 
         self.time_label.setAlignment(Qt.AlignCenter)
         self.time_label.setStyleSheet("font-size: 48px; margin-bottom: 0px;")
 
-        
         self.date_label.setAlignment(Qt.AlignVCenter)
         self.date_label.setAlignment(Qt.AlignLeft)
         self.date_label.setStyleSheet("font-size: 18px; margin-top: 0px;")
@@ -69,6 +68,8 @@ class WorkTimerWindow(QWidget):
         self.timer.timeout.connect(self.update_display)
          
         self.setLayout(vbox)
+
+        self.stats_button.clicked.connect(self.switch_to_stats.emit)
 
 
     def start(self):
@@ -95,14 +96,11 @@ class WorkTimerWindow(QWidget):
         milliseconds = time.msec() // 10
         return f"{hours:02}:{minutes:02}:{seconds:02}.{milliseconds:02}"
         
-
     def update_display(self):
         self.elapsed_time = self.elapsed_time.addMSecs(10)
         self.time_label.setText(self.format_time(self.elapsed_time))
         
-
     def update_date(self):
-
         old_date = self.date_label.text()
         if old_date != QDate.currentDate().toString("d.M.yyyy"):
             started = self.timer.isActive()
@@ -115,4 +113,6 @@ class WorkTimerWindow(QWidget):
                 self.reset()
 
         self.date_label.setText(QDate.currentDate().toString("d.M.yyyy"))
+
+
 

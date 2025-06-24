@@ -1,12 +1,28 @@
-from PyQt5.QtWidgets import QWidget, QStackedLayout
-from views import WorkTimerWindow
+from PyQt5.QtWidgets import QWidget, QStackedLayout, QSizePolicy
+from views import WorkTimerWindow, StatsWindow
+
+# class for managing the view that is visible to the user
 
 class ViewController(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.work_timer = WorkTimerWindow()
+        self.work_timer_view = WorkTimerWindow()
+        self.stats_view = StatsWindow()
 
-        view_stack = QStackedLayout()
-        view_stack.addWidget(self.work_timer)
-        self.setLayout(view_stack)
+        self.view_stack = QStackedLayout()
+        self.view_stack.addWidget(self.work_timer_view)
+        self.view_stack.addWidget(self.stats_view)
+        self.setLayout(self.view_stack)
+
+        self.view_stack.setCurrentWidget(self.work_timer_view)
+        self.setFixedSize(self.work_timer_view.sizeHint())
+
+        self.work_timer_view.switch_to_stats.connect(lambda: self.change_view(self.stats_view))
+        self.stats_view.switch_to_timer.connect(lambda: self.change_view(self.work_timer_view))
+
+    def change_view(self, view):
+        self.view_stack.setCurrentWidget(view)
+        self.setFixedSize(view.sizeHint())
+
+
