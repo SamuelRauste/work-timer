@@ -20,6 +20,7 @@ class WorkTimerWindow(QWidget):
                 starting_time = i[1]
                 previous_data_found = True
 
+
         
         
         self.time_label = QLabel(starting_time, self)
@@ -36,9 +37,9 @@ class WorkTimerWindow(QWidget):
         if not previous_data_found:
             self.elapsed_time = QTime(0, 0, 0, 0)
         else:
-            hours_str, minutes_str, sec_msec_str = starting_time.split(':')
-            seconds_str, milliseconds_str = sec_msec_str.split('.')
-            self.elapsed_time = QTime(int(hours_str), int(minutes_str), int(seconds_str), int(milliseconds_str))
+            hours_str, minutes_str, sec_csec_str = starting_time.split(':')
+            seconds_str, centiseconds_str = sec_csec_str.split('.')
+            self.elapsed_time = QTime(int(hours_str), int(minutes_str), int(seconds_str), int(centiseconds_str) * 10)
             
         self.timer.timeout.connect(self.update_display)
 
@@ -117,8 +118,8 @@ class WorkTimerWindow(QWidget):
         hours = time.hour()
         minutes = time.minute()
         seconds = time.second()
-        milliseconds = time.msec() // 10
-        return f"{hours:02}:{minutes:02}:{seconds:02}.{milliseconds:02}"
+        centiseconds = time.msec() // 10
+        return f"{hours:02}:{minutes:02}:{seconds:02}.{centiseconds:02}"
         
     def update_display(self):
         self.elapsed_time = self.elapsed_time.addMSecs(10)
