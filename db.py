@@ -43,6 +43,9 @@ def get_all_data():
 
     data = cursor.fetchall()
     conn.close()
+    print("Here's all data currently in the db: ")
+    for i in data:
+        print(i)
     return data
 
 

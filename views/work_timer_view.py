@@ -1,8 +1,14 @@
 from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QVBoxLayout, QHBoxLayout
 from PyQt5.QtCore import Qt, QTimer, QTime, QDate, QSize, pyqtSignal
+from datetime import datetime
 import db
 
 # The view for the actual timer and its functionalities
+
+def format_date(date_str):
+    date_obj = datetime.strptime(date_str, "%d.%m.%Y")
+    return date_obj.strftime("%Y-%m-%d")
+
 
 class WorkTimerWindow(QWidget):
     switch_to_stats = pyqtSignal()
@@ -16,7 +22,7 @@ class WorkTimerWindow(QWidget):
         previous_data_found = False
 
         for i in self.data:
-            if i[0] == QDate.currentDate().toString("d.M.yyyy"):
+            if i[0] == QDate.currentDate().toString("yyyy-MM-dd"):
                 starting_time = i[1]
                 previous_data_found = True
 
@@ -104,7 +110,7 @@ class WorkTimerWindow(QWidget):
         self.timer.stop()
         self.start_button.setEnabled(True)
         self.stop_button.setEnabled(False)
-        db.log_time(self.date_label.text(), self.time_label.text())
+        db.log_time(format_date(self.date_label.text()), self.time_label.text())
 
     def reset(self):
         self.timer.stop()
@@ -112,7 +118,7 @@ class WorkTimerWindow(QWidget):
         self.time_label.setText(self.format_time(self.elapsed_time))
         self.start_button.setEnabled(True)
         self.stop_button.setEnabled(False)
-        db.log_time(self.date_label.text(), self.time_label.text())
+        db.log_time(format_date(self.date_label.text()), self.time_label.text())
 
     def format_time(self, time):
         hours = time.hour()
@@ -126,7 +132,7 @@ class WorkTimerWindow(QWidget):
         self.time_label.setText(self.format_time(self.elapsed_time))
         
     def update_date_and_db(self):
-        db.log_time(self.date_label.text(), self.time_label.text())
+        db.log_time(format_date(self.date_label.text()), self.time_label.text())
         old_date = self.date_label.text()
         if old_date != QDate.currentDate().toString("d.M.yyyy"):
             started = self.timer.isActive()
@@ -134,7 +140,6 @@ class WorkTimerWindow(QWidget):
             if started:
                 self.start()
         
-
         self.date_label.setText(QDate.currentDate().toString("d.M.yyyy"))
 
 
