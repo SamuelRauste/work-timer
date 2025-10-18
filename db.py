@@ -38,7 +38,10 @@ def get_all_data():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM time_logs")
+    cursor.execute("""
+    SELECT * FROM time_logs
+    ORDER BY DATE(date) DESC
+    """)
     #print("fetched all data from work_timer.db")
 
     data = cursor.fetchall()
