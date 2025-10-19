@@ -10,6 +10,8 @@ class ViewController(QWidget):
         self.work_timer_view = WorkTimerWindow()
         self.stats_view = StatsWindow()
 
+        self.work_timer_view.update_plot.connect(self.stats_view.draw_plot)
+
         self.view_stack = QStackedLayout()
         self.view_stack.addWidget(self.work_timer_view)
         self.view_stack.addWidget(self.stats_view)

@@ -12,6 +12,7 @@ def format_date(date_str):
 
 class WorkTimerWindow(QWidget):
     switch_to_stats = pyqtSignal()
+    update_plot = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -27,8 +28,6 @@ class WorkTimerWindow(QWidget):
                 previous_data_found = True
 
 
-        
-        
         self.time_label = QLabel(starting_time, self)
         self.date_label = QLabel(self)
         self.start_button = QPushButton("Start", self)
@@ -139,8 +138,9 @@ class WorkTimerWindow(QWidget):
             self.reset()
             if started:
                 self.start()
-        
         self.date_label.setText(QDate.currentDate().toString("d.M.yyyy"))
+        self.update_plot.emit()
+
 
 
 
