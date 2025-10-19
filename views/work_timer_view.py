@@ -56,7 +56,7 @@ class WorkTimerWindow(QWidget):
 
         self.date_timer = QTimer(self)
         self.date_timer.timeout.connect(self.update_date_and_db)
-        self.date_timer.start(100)
+        self.date_timer.start(1000)
         self.update_date_and_db()
 
         

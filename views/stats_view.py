@@ -9,14 +9,42 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 class StatsWindow(QWidget):
     switch_to_timer = pyqtSignal()
+
+    
     
 
     def __init__(self):
         super().__init__()
 
+        self.current_mode = 7
+
+        def change_mode(days):
+            self.current_mode = days
+            self.plot_time_per_day(days)
+
         self.work_timer_view_btn = QPushButton("Timer", self)
 
+        self.week_button = QPushButton("7", self)
+        self.week_button.clicked.connect(lambda: change_mode(7))
+
+        self.month_button = QPushButton("30", self)
+        self.month_button.clicked.connect(lambda: change_mode(30))
+
+        self.half_year_button = QPushButton("6 months", self)
+        self.half_year_button.clicked.connect(lambda: change_mode(182))
+
+        self.year_button = QPushButton("1 year", self)
+        self.year_button.clicked.connect(lambda: change_mode(365))
+
+        time_buttons = QHBoxLayout()
+        time_buttons.addWidget(self.week_button)
+        time_buttons.addWidget(self.month_button)
+        time_buttons.addWidget(self.half_year_button)
+        time_buttons.addWidget(self.year_button)
+
         vbox = QVBoxLayout()
+
+        vbox.addLayout(time_buttons)
 
         self.df = self.build_full_df()
 
@@ -63,16 +91,16 @@ class StatsWindow(QWidget):
     def draw_plot(self, new_seconds):
             today = pd.to_datetime(QDate.currentDate().toString("yyyy-MM-dd"))
             self.df.loc[self.df['date'] == today, 'seconds'] = new_seconds
-            self.plot_time_per_day()
+            self.plot_time_per_day(self.current_mode)
 
     def get_window_df(self, days):
             end_date = self.df['date'].max()
             start_date = end_date - pd.Timedelta(days=days)
             return self.df[(self.df['date'] >= start_date) & (self.df['date'] <= end_date)]
 
-    def plot_time_per_day(self):
+    def plot_time_per_day(self, days):
 
-        current_df = self.get_window_df(30).copy()
+        current_df = self.get_window_df(days).copy()
 
         current_df = current_df.sort_values('date')
 
@@ -82,7 +110,10 @@ class StatsWindow(QWidget):
         self.ax.plot(current_df['date'], current_df['seconds'], marker='o', linestyle='-')
 
         self.ax.set_xticks(current_df['date'])
-        self.ax.set_xticklabels(weekday_labels)
+        if self.current_mode == 7:
+            self.ax.set_xticklabels(weekday_labels)
+        else:
+            self.ax.set_xticklabels([])
 
         min_date = current_df['date'].min()
         max_date = current_df['date'].max()
