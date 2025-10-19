@@ -51,6 +51,9 @@ class StatsWindow(QWidget):
         self.ax.set_ylabel("Time (seconds)")
         self.ax.grid(True)
         self.figure.autofmt_xdate()  # Rotate date labels for readability
+        self.ax.set_ylim(bottom=0)
+        ymax = self.df['seconds'].max() * 1.2  # 20% margin above highest point
+        self.ax.set_ylim(0, ymax)
         self.canvas.draw()
 
 
