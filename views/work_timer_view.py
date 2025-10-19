@@ -9,10 +9,14 @@ def format_date(date_str):
     date_obj = datetime.strptime(date_str, "%d.%m.%Y")
     return date_obj.strftime("%Y-%m-%d")
 
+def time_to_seconds(t):
+                h, m, s = t.split(':')
+                return int(h)*3600 + int(m)*60 + float(s)
+
 
 class WorkTimerWindow(QWidget):
     switch_to_stats = pyqtSignal()
-    update_plot = pyqtSignal()
+    update_plot = pyqtSignal(float)
 
     def __init__(self):
         super().__init__()
@@ -52,7 +56,7 @@ class WorkTimerWindow(QWidget):
 
         self.date_timer = QTimer(self)
         self.date_timer.timeout.connect(self.update_date_and_db)
-        self.date_timer.start(1000)
+        self.date_timer.start(100)
         self.update_date_and_db()
 
         
@@ -105,7 +109,7 @@ class WorkTimerWindow(QWidget):
     def change_view(self):
             if self.current_view == "w":
                 self.current_view = "s"
-                self.update_plot.emit()
+                self.update_plot.emit(time_to_seconds(self.time_label.text()))
             else:
                 self.current_view = "w"
             return
@@ -129,7 +133,7 @@ class WorkTimerWindow(QWidget):
         self.start_button.setEnabled(True)
         self.stop_button.setEnabled(False)
         db.log_time(format_date(self.date_label.text()), self.time_label.text())
-        self.update_plot.emit()
+        self.update_plot.emit(time_to_seconds(self.time_label.text()))
 
     def format_time(self, time):
         hours = time.hour()
@@ -152,7 +156,8 @@ class WorkTimerWindow(QWidget):
                 self.start()
         self.date_label.setText(QDate.currentDate().toString("d.M.yyyy"))
         if self.current_view == "s":
-            self.update_plot.emit()
+
+            self.update_plot.emit(time_to_seconds(self.time_label.text()))
 
 
 
