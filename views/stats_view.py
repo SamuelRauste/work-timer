@@ -40,15 +40,16 @@ class StatsWindow(QWidget):
             self.df = pd.DataFrame(self.data, columns=['date', 'time'])
             self.df['date'] = pd.to_datetime(self.df['date'])
             self.df['seconds'] = self.df['time'].apply(self.time_to_seconds)
+            self.df['weekday'] = self.df['date'].dt.strftime('%a').str.upper()
             self.df = self.df.sort_values('date')
             self.plot_time_per_day()
 
     def plot_time_per_day(self):
         self.ax.clear()
-        self.ax.plot(self.df['date'], self.df['seconds'], marker='o', linestyle='-')
-        self.ax.set_title("Time per Day")
-        self.ax.set_xlabel("Date")
-        self.ax.set_ylabel("Time (seconds)")
+        self.ax.plot(self.df['weekday'], self.df['seconds'], marker='o', linestyle='-')
+        #self.ax.set_title("Time per Day")
+        #self.ax.set_xlabel("Date")
+        #self.ax.set_ylabel("Time (seconds)")
         self.ax.grid(True)
         self.figure.autofmt_xdate()  # Rotate date labels for readability
         self.ax.set_ylim(bottom=0)
