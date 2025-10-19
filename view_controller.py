@@ -26,5 +26,6 @@ class ViewController(QWidget):
     def change_view(self, view):
         self.view_stack.setCurrentWidget(view)
         self.setFixedSize(view.sizeHint())
+        self.work_timer_view.change_view()
 
 
