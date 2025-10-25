@@ -10,8 +10,6 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 class StatsWindow(QWidget):
     switch_to_timer = pyqtSignal()
 
-    
-    
 
     def __init__(self):
         super().__init__()
@@ -53,8 +51,6 @@ class StatsWindow(QWidget):
         self.canvas = FigureCanvas(self.figure)
         vbox.addWidget(self.canvas)
 
-        #self.draw_plot()
-
         vbox.addWidget(self.work_timer_view_btn)
         self.setLayout(vbox)
 
@@ -95,7 +91,7 @@ class StatsWindow(QWidget):
 
     def get_window_df(self, days):
             end_date = self.df['date'].max()
-            start_date = end_date - pd.Timedelta(days=days)
+            start_date = end_date - pd.Timedelta(days=days - 1)
             return self.df[(self.df['date'] >= start_date) & (self.df['date'] <= end_date)]
 
     def plot_time_per_day(self, days):
@@ -106,14 +102,25 @@ class StatsWindow(QWidget):
 
         weekday_labels = current_df['date'].dt.strftime('%a').str.upper()
 
+        daynumber_labels = current_df['date'].dt.day.tolist()
+
+        daynumber_labels = [str(i) if i % 5 == 0 else "" for i in daynumber_labels]
+
+        month_labels = [
+            date.strftime('%b') if date.day == 1 else ''
+            for date in current_df['date']
+        ]
+
         self.ax.clear()
         self.ax.plot(current_df['date'], current_df['seconds'], marker='o', linestyle='-')
 
         self.ax.set_xticks(current_df['date'])
         if self.current_mode == 7:
             self.ax.set_xticklabels(weekday_labels)
+        elif self.current_mode == 30:
+            self.ax.set_xticklabels(daynumber_labels)
         else:
-            self.ax.set_xticklabels([])
+             self.ax.set_xticklabels(month_labels)
 
         min_date = current_df['date'].min()
         max_date = current_df['date'].max()
@@ -121,7 +128,6 @@ class StatsWindow(QWidget):
 
 
         self.ax.grid(True)
-        #self.figure.autofmt_xdate()  # Rotate date labels for readability
         self.ax.set_ylim(bottom=0)
         ymax = self.df['seconds'].max() * 1.2  # 20% margin above highest point
         self.ax.set_ylim(0, ymax)
