@@ -4,6 +4,8 @@ import db
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import matplotlib.ticker as mtick
+import numpy as np
 
 # The view where statistics will be displayed
 
@@ -112,7 +114,7 @@ class StatsWindow(QWidget):
         ]
 
         self.ax.clear()
-        self.ax.plot(current_df['date'], current_df['seconds'], marker='o', linestyle='-')
+        self.ax.plot(current_df['date'], current_df['seconds'], marker='None', linestyle='-', linewidth='2')
 
         self.ax.set_xticks(current_df['date'])
         if self.current_mode == 7:
@@ -127,10 +129,41 @@ class StatsWindow(QWidget):
         self.ax.set_xlim(min_date, max_date + pd.Timedelta(days=0.5))
 
 
-        self.ax.grid(True)
+        if self.current_mode == 7 or self.current_mode == 30:
+            self.ax.grid(True)
         self.ax.set_ylim(bottom=0)
         ymax = self.df['seconds'].max() * 1.2  # 20% margin above highest point
         self.ax.set_ylim(0, ymax)
+
+        # Determine tick interval
+        if ymax < 7200:  # < 2 hours
+            # Choose 5 or 10 min intervals depending on ymax
+            step = 300 if ymax <= 1800 else 600
+        else:
+            # Choose 30 min or 1 h intervals
+            step = 1800 if ymax <= 10800 else 3600
+
+        y_ticks = np.arange(0, ymax + step, step)
+        self.ax.set_yticks(y_ticks)
+
+        def seconds_to_human(x, pos):
+            if x == 0:
+                return ""
+            if ymax < 7200:  # < 2 hours
+                minutes = int(x / 60)
+                return f"{minutes} min"
+            else:
+                hours = int(x // 3600)
+                minutes = int((x % 3600) // 60)
+                if hours == 0:
+                    return f"{minutes} min"
+                elif minutes == 0:
+                    return f"{hours} h"
+                else:
+                    return f"{hours} h {minutes} min"
+
+        self.ax.yaxis.set_major_formatter(mtick.FuncFormatter(seconds_to_human))
+    
         self.canvas.draw()
 
 
