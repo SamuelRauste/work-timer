@@ -22,6 +22,7 @@ class WorkTimerWindow(QWidget):
         super().__init__()
 
         self.current_view = "w"
+        self.is_running = False
 
         self.data = db.get_all_data()
         
@@ -116,17 +117,20 @@ class WorkTimerWindow(QWidget):
 
 
     def start(self):
+        self.is_running = True
         self.timer.start(10)
         self.stop_button.setEnabled(True)
         self.start_button.setEnabled(False)
 
     def stop(self):
+        self.is_running = False
         self.timer.stop()
         self.start_button.setEnabled(True)
         self.stop_button.setEnabled(False)
         db.log_time(format_date(self.date_label.text()), self.time_label.text())
 
     def reset(self):
+        self.is_running = False
         self.timer.stop()
         self.elapsed_time = QTime(0, 0, 0, 0)
         self.time_label.setText(self.format_time(self.elapsed_time))
@@ -155,7 +159,7 @@ class WorkTimerWindow(QWidget):
             if started:
                 self.start()
         self.date_label.setText(QDate.currentDate().toString("d.M.yyyy"))
-        if self.current_view == "s":
+        if self.current_view == "s" and self.is_running:
 
             self.update_plot.emit(time_to_seconds(self.time_label.text()))
 
