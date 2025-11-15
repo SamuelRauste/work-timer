@@ -165,6 +165,9 @@ class StatsWindow(QWidget):
                     return f"{hours} h {minutes} min"
 
         self.ax.yaxis.set_major_formatter(mtick.FuncFormatter(seconds_to_human))
+
+        if self.current_mode in [182, 365]:
+            self.ax.tick_params(axis='x', which='both', length=0)
     
         self.canvas.draw()
 
