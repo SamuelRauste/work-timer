@@ -3,7 +3,13 @@ venv/
 
 work_timer.db
 
+# PyInstaller
+/dist/
+/build/
+*.spec
+
 # Ignore Python bytecode cache files
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc

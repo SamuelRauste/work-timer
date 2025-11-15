@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QStackedLayout, QSizePolicy
 from views import WorkTimerWindow, StatsWindow
-from PyQt5 import QtGui
+from PyQt5.QtGui import QIcon
+import sys, os
 
 # class for managing the view that is visible to the user
 
@@ -8,8 +9,17 @@ class ViewController(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowIcon(QtGui.QIcon("favicon.ico"))
-        self.setWindowTitle(" ")
+        def resource_path(relative_path):
+            if hasattr(sys, "_MEIPASS"):
+                return os.path.join(sys._MEIPASS, relative_path)
+            return os.path.join(os.path.abspath("."), relative_path)
+
+        icon_path = resource_path("favicon.ico")
+        self.setWindowIcon(QIcon(icon_path))
+
+
+
+        self.setWindowTitle("work-timer")
 
         self.work_timer_view = WorkTimerWindow()
         self.stats_view = StatsWindow()
