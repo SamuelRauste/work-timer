@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QVBoxLayout, QHBoxLayo
 from PyQt5.QtCore import Qt, QTimer, QTime, QDate, QSize, pyqtSignal
 from datetime import datetime
 import db
+from PyQt5.QtGui import QFont
 
 # The view for the actual timer and its functionalities
 
@@ -90,8 +91,13 @@ class WorkTimerWindow(QWidget):
         vbox.addWidget(self.stats_button)
         vbox.setSpacing(2)
 
+        self.labelfont = QFont("Google Sans Code")
+
         self.time_label.setAlignment(Qt.AlignCenter)
         self.time_label.setStyleSheet("font-size: 48px; margin-bottom: 0px;")
+        self.time_label.setFont(self.labelfont)
+
+        
 
         self.date_label.setAlignment(Qt.AlignVCenter)
         self.date_label.setAlignment(Qt.AlignLeft)

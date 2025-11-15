@@ -44,7 +44,7 @@ class StatsWindow(QWidget):
 
         vbox = QVBoxLayout()
 
-        vbox.addLayout(time_buttons)
+        
 
         self.df = self.build_full_df()
 
@@ -52,6 +52,8 @@ class StatsWindow(QWidget):
         self.figure, self.ax = plt.subplots()
         self.canvas = FigureCanvas(self.figure)
         vbox.addWidget(self.canvas)
+
+        vbox.addLayout(time_buttons)
 
         vbox.addWidget(self.work_timer_view_btn)
         self.setLayout(vbox)
