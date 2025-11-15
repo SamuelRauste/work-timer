@@ -1,11 +1,15 @@
 from PyQt5.QtWidgets import QWidget, QStackedLayout, QSizePolicy
 from views import WorkTimerWindow, StatsWindow
+from PyQt5 import QtGui
 
 # class for managing the view that is visible to the user
 
 class ViewController(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.setWindowIcon(QtGui.QIcon("favicon.ico"))
+        self.setWindowTitle(" ")
 
         self.work_timer_view = WorkTimerWindow()
         self.stats_view = StatsWindow()

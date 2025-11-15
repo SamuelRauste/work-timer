@@ -102,6 +102,7 @@ class WorkTimerWindow(QWidget):
         self.date_label.setAlignment(Qt.AlignVCenter)
         self.date_label.setAlignment(Qt.AlignLeft)
         self.date_label.setStyleSheet("font-size: 18px; margin-top: 0px;")
+        #self.date_label.setFont(self.labelfont)
 
         self.start_button.clicked.connect(self.start)
         self.stop_button.clicked.connect(self.stop)
